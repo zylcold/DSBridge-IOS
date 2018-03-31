@@ -27,20 +27,23 @@
 +(NSArray *)allMethodFromClass:(Class)class
 {
     NSMutableArray *arr = [NSMutableArray array];
-    u_int count;
-    Method *methods = class_copyMethodList(class, &count);
-    for (int i =0; i<count; i++) {
-        SEL name1 = method_getName(methods[i]);
-        const char *selName= sel_getName(name1);
-        NSString *strName = [NSString stringWithCString:selName encoding:NSUTF8StringEncoding];
-        //NSLog(@"%@",strName);
-        [arr addObject:strName];
+    while ((class_getSuperclass(class))) {
+        u_int count;
+        Method *methods = class_copyMethodList(class, &count);
+        for (int i =0; i<count; i++) {
+            SEL name1 = method_getName(methods[i]);
+            const char *selName= sel_getName(name1);
+            NSString *strName = [NSString stringWithCString:selName encoding:NSUTF8StringEncoding];
+            //NSLog(@"%@",strName);
+            [arr addObject:strName];
+        }
+        free(methods);
+        class = class_getSuperclass(class);
     }
-    free(methods);
     return arr;
 }
 
-//return method name for xxx: or xxx:handle:
+// method name for xxreturnx: or xxx:handle:
 +(NSString *)methodByNameArg:(NSInteger)argNum selName:(NSString *)selName class:(Class)class
 {
     NSString *result = nil;
